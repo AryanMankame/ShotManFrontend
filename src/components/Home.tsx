@@ -3,13 +3,20 @@ import styled from 'styled-components';
 import {socket} from './socket/Socket'
 import Player from './parts/Player';
 import Enemy from './parts/Enemy';
+import { useNavigate } from 'react-router-dom';
 var timer : any = null;
 var timerenemy : any = null
 var btnpress : boolean = false;
 var enemybtnpress : boolean = false
 var enemyinter : any = null;
 const Home : React.FC = () => {
+  const navigate = useNavigate();
   useEffect(() => {
+    localStorage.setItem('winner',"Nobody wins!")
+    setTimeout(() => {
+      navigate('/winner');
+      console.log('done')
+    },5*60*1000);
     socket.on('connect', () => {
       // var socketId = socket.id
       console.log('Connected Socket',socket.id);
@@ -36,7 +43,10 @@ const Home : React.FC = () => {
        },1);
       }
     })
-
+    socket.on('score',(args) => {
+      localStorage.setItem('playerscore',args.playerscore); 
+      localStorage.setItem('enemyscore',args.enemyscore);
+    })
     localStorage.setItem('playerpos','0');
     
   },[])
@@ -53,7 +63,9 @@ const Home : React.FC = () => {
     x : window.innerWidth-40, y : 0
   });
   const [enemyPos,setenemyPos] = useState<number>(0);
-  
+  const [playerscore,setplayerscore] = useState<number>(0);
+  const [enemyscore,setenemyscore] = useState<number>(0);
+
   // Player's bullet has crossed the right window so bring back the bullet to the player
   if(bulletPos.x >= window.innerWidth-20){
     if(timer !== null){
@@ -90,17 +102,33 @@ const Home : React.FC = () => {
     clearInterval(timer);
     setbulletPos({x : 30 , y : playPos + 5});
     btnpress = false; timer = null;
+    const playsc = Number(localStorage.getItem('playerscore'));
+    const enemysc = Number(localStorage.getItem('enemyscore'));
+    socket.emit('score',{ playerscore : enemysc, enemyscore : playsc+1, playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid') })
+    // localStorage.setItem('playerscore', String(playsc+1))
+    setplayerscore(sc => sc+1);
+    var hostName : any = localStorage.getItem('hostname')
+    var playerName : any = localStorage.getItem('playerName');
+    playerscore > enemyscore ? localStorage.setItem('winner',hostName) : localStorage.setItem('winner',playerName);
   }
 
   // if enemy bullet hits the player then enemy gets the point
   if(enemybulletPos.x <= 110 && enemybulletPos.y >= playPos && enemybulletPos.y <= playPos + 80){
-    console.log('Player Point')
+    clearInterval(timerenemy);
+    setenemybulletPos({ x : window.innerWidth - 40 , y : enemyPos + 5 })
+    enemybtnpress = false; timerenemy = null;
+    const playsc = Number(localStorage.getItem('playerscore'));
+    const enemysc = Number(localStorage.getItem('enemyscore'));
+    socket.emit('score',{ playerscore : enemysc+1, enemyscore : playsc , playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid')})
+    // localStorage.setItem('enemyscore', String(enemysc+1))
+    setenemyscore(sc => sc+1)
+    var hostName : any = localStorage.getItem('hostname')
+    var playerName : any = localStorage.getItem('playerName');
+    playerscore > enemyscore ? localStorage.setItem('winner',hostName) : localStorage.setItem('winner',playerName);
   }
 
   useEffect(() => {
     localStorage.setItem('enemyinc','10');
-    localStorage.setItem('score','0'); 
-    
     // Offline enemy motion logic : 
     // if(enemyinter === null){
     //   enemyinter = setInterval(() => {
@@ -164,7 +192,8 @@ const Home : React.FC = () => {
           <img src="https://cdn-icons-png.flaticon.com/128/2218/2218103.png" alt="" className="" id="bullet-img" />
         </div>
       </PlayerDiv>
-      <div id = "score">Score : {localStorage.getItem('score')}</div>
+      <div id = "score">{localStorage.getItem('hostname')} : {playerscore}</div>
+      <div id = "score">{localStorage.getItem('playerName')} : {enemyscore}</div>
       <PlayerDiv>
         <Enemy pos = {enemyPos} />
         <div id = "bullet-enemy" style = {{ top : enemybulletPos.y + 5, left : enemybulletPos.x }}>
@@ -176,7 +205,6 @@ const Home : React.FC = () => {
   )
 }
 const PlayerDiv = styled.div`
-    background-color : pink;
     width : 10vw;
     height : 100vh;
     display : flex; flex-direction : column;
@@ -188,7 +216,7 @@ const PlayerDiv = styled.div`
       left : 10px;
     }
     #enemy{
-      right : 10px;
+      right : 25px;
     }
     #player-img,#enemy-img{
       height : 80px; width : 80px; 

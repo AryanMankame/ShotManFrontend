@@ -1,6 +1,7 @@
 import './App.css';
 import Home from './components/Home';
 import Landing from './components/Landing/Landing';
+import Winner from './components/Winner';
 import Webrtc from './components/webRTC/Webrtc';
 import {
   createBrowserRouter,
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path : "/game",
     element : <Home />
+  },
+  {
+    path : "/winner",
+    element : <Winner />
   }
 ])
 function App() {

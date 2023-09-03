@@ -14,7 +14,10 @@ function Modal(props : any) {
 
   useEffect(() => {
     socket.on('userconnect',(args) => {
-      localStorage.setItem('opponentplayerid',args);
+      console.log(args);
+      localStorage.setItem('opponentplayerid',args.id);
+      localStorage.setItem('hostname',args.hostName);
+      localStorage.setItem('playerName',args.playerName);
       navigate('/game');
     })
   },[])
@@ -70,7 +73,7 @@ function Modal(props : any) {
             </div>
             </div>
             :<div className="container">
-            <div id = "close" style ={{color:'red',marginLeft:'25vw',marginBottom:'3vh'}}
+            <div id = "close" style ={{color:'red',marginLeft:'25vw',marginBottom:'5vh',marginTop:'2vh'}}
             onClick={() => {
                 props.close();
             }}>Close</div>
@@ -104,13 +107,17 @@ const Page = styled.div`
         height : 40vh; width : 40vh;
     }
     button {
-        height : 50px; width : 80px;
+        height : 60px; width : 80px;
         margin-right : .5pc;
         margin-left : .5pc;
         border-radius : 10px;
         background-color : lightgreen;
         color : white;
         font-weight : bold;
+        &:hover{
+          transform : scale(1.1);
+          cursor : pointer;
+        }
     }
     .container{
         display : flex;
@@ -124,7 +131,7 @@ const Page = styled.div`
     }
     input{
         width : 80%;
-        height : 8%;
+        height : 12%;
         margin-bottom : 2vh;
         font-size : 16px;
         border-radius : 5px;
