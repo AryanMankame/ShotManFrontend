@@ -1,1 +1,1 @@
-export const backendUrl = 'https://shot-man-backend.vercel.app'
+export const backendUrl = 'https://shotmanbackend.onrender.com'
