@@ -137,7 +137,6 @@ const Home : React.FC = () => {
   }
 
   useEffect(() => {
-    return () => {
     sessionStorage.setItem('enemyinc','10');
     // Offline enemy motion logic : 
     // if(enemyinter === null){
@@ -193,7 +192,6 @@ const Home : React.FC = () => {
       }
       // console.log(btnpress);
     })
-  }
   },[]);
   return (
     <Page>
