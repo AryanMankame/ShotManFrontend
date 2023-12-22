@@ -15,7 +15,6 @@ const Home : React.FC = () => {
   const [playsc, setplaysc] = useState(0);
   const [enemysc, setenemysc] = useState(0);
   useEffect(() => {
-    return () => {
     sessionStorage.setItem('winner',"Nobody wins!")
     if(winnerset) {console.log('winner set now!!!',winnerset); return ;}
     setTimeout(() => {
@@ -56,7 +55,6 @@ const Home : React.FC = () => {
     sessionStorage.setItem('playerpos','0');
     sessionStorage.setItem('playerscore','0');
     sessionStorage.setItem('enemyscore','0');
-  }
   },[])
 
 
