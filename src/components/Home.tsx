@@ -9,18 +9,24 @@ var timerenemy : any = null
 var btnpress : boolean = false;
 var enemybtnpress : boolean = false
 var enemyinter : any = null;
+var winnerset : boolean = false;
 const Home : React.FC = () => {
   const navigate = useNavigate();
+  const [playsc, setplaysc] = useState(0);
+  const [enemysc, setenemysc] = useState(0);
   useEffect(() => {
-    localStorage.setItem('winner',"Nobody wins!")
+    return () => {
+    sessionStorage.setItem('winner',"Nobody wins!")
+    if(winnerset) {console.log('winner set now!!!',winnerset); return ;}
     setTimeout(() => {
       navigate('/winner');
       console.log('done')
-    },5*60*1000);
+    },5*60*10000);
+    winnerset = true;
     socket.on('connect', () => {
       // var socketId = socket.id
       console.log('Connected Socket',socket.id);
-      localStorage.setItem('socketid',socket.id);
+      sessionStorage.setItem('socketid',socket.id);
       socket.on('server',(args) => {
         console.log("server ====> ",args);
       })
@@ -44,11 +50,13 @@ const Home : React.FC = () => {
       }
     })
     socket.on('score',(args) => {
-      localStorage.setItem('playerscore',args.playerscore); 
-      localStorage.setItem('enemyscore',args.enemyscore);
+      setplaysc(args.playerscore); setenemysc(args.enemyscore);
+      console.log(args)
     })
-    localStorage.setItem('playerpos','0');
-    
+    sessionStorage.setItem('playerpos','0');
+    sessionStorage.setItem('playerscore','0');
+    sessionStorage.setItem('enemyscore','0');
+  }
   },[])
 
 
@@ -60,7 +68,7 @@ const Home : React.FC = () => {
     x : 30, y : 0
   });
   const [enemybulletPos,setenemybulletPos] = useState<point>({
-    x : window.innerWidth-40, y : 0
+    x : window.innerWidth-60, y : 0
   });
   const [enemyPos,setenemyPos] = useState<number>(0);
   const [playerscore,setplayerscore] = useState<number>(0);
@@ -84,56 +92,58 @@ const Home : React.FC = () => {
       enemybtnpress = false;
       timerenemy = null;
     }
-    setenemybulletPos({x : window.innerWidth - 40 , y : enemyPos + 5});
+    setenemybulletPos({x : window.innerWidth - 60 , y : enemyPos + 5});
   }
 
   // Offline Enemy movement logic : 
   // if(enemyPos >= window.innerHeight-60){
-  //   localStorage.setItem('enemyinc','-10');
-  //   // console.log(localStorage.getItem('enemyinc'));
+  //   sessionStorage.setItem('enemyinc','-10');
+  //   // console.log(sessionStorage.getItem('enemyinc'));
   // }
   // if(enemyPos <= 5){
-  //   localStorage.setItem('enemyinc','10');
+  //   sessionStorage.setItem('enemyinc','10');
   // }
 
   // if bullet hits the enemy player gets the point
   if(bulletPos.x >= window.innerWidth - 70 && bulletPos.x <= window.innerWidth - 10 && bulletPos.y >= enemyPos && bulletPos.y <= enemyPos+80){
-    localStorage.setItem('score',`${Number(localStorage.getItem('score'))+.5}`);
     clearInterval(timer);
     setbulletPos({x : 30 , y : playPos + 5});
     btnpress = false; timer = null;
-    const playsc = Number(localStorage.getItem('playerscore'));
-    const enemysc = Number(localStorage.getItem('enemyscore'));
-    socket.emit('score',{ playerscore : enemysc, enemyscore : playsc+1, playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid') })
-    // localStorage.setItem('playerscore', String(playsc+1))
-    setplayerscore(sc => sc+1);
-    var hostName : any = localStorage.getItem('hostname')
-    var playerName : any = localStorage.getItem('playerName');
-    playerscore > enemyscore ? localStorage.setItem('winner',hostName) : localStorage.setItem('winner',playerName);
+    // const playsc = Number(sessionStorage.getItem('playerscore'));
+    // const enemysc = Number(sessionStorage.getItem('enemyscore'));
+    socket.emit('score',{ playerscore : enemysc, enemyscore : playsc+1, sendTo : sessionStorage.getItem('opponentplayerid') })
+    setplaysc(sc => sc+1);
+    // sessionStorage.setItem('playerscore', String(playsc+1))
+    // setplayerscore(sc => sc+1);
+    var hostName : any = sessionStorage.getItem('hostname')
+    var playerName : any = sessionStorage.getItem('playerName');
+    playerscore > enemyscore ? sessionStorage.setItem('winner',hostName) : sessionStorage.setItem('winner',playerName);
+    console.log('Player Score has increased by one point')
   }
 
   // if enemy bullet hits the player then enemy gets the point
   if(enemybulletPos.x <= 110 && enemybulletPos.y >= playPos && enemybulletPos.y <= playPos + 80){
     clearInterval(timerenemy);
-    setenemybulletPos({ x : window.innerWidth - 40 , y : enemyPos + 5 })
+    setenemybulletPos({ x : window.innerWidth - 60 , y : enemyPos + 5 })
     enemybtnpress = false; timerenemy = null;
-    const playsc = Number(localStorage.getItem('playerscore'));
-    const enemysc = Number(localStorage.getItem('enemyscore'));
-    socket.emit('score',{ playerscore : enemysc+1, enemyscore : playsc , playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid')})
-    // localStorage.setItem('enemyscore', String(enemysc+1))
-    setenemyscore(sc => sc+1)
-    var hostName : any = localStorage.getItem('hostname')
-    var playerName : any = localStorage.getItem('playerName');
-    playerscore > enemyscore ? localStorage.setItem('winner',hostName) : localStorage.setItem('winner',playerName);
+    // const playsc = Number(sessionStorage.getItem('playerscore'));
+    // const enemysc = Number(sessionStorage.getItem('enemyscore'));
+    // socket.emit('score',{ playerscore : enemysc+1, enemyscore : playsc , sendTo : sessionStorage.getItem('opponentplayerid')})
+    // sessionStorage.setItem('enemyscore', String(enemysc+1))
+    // setenemyscore(sc => sc+1)
+    var hostName : any = sessionStorage.getItem('hostname')
+    var playerName : any = sessionStorage.getItem('playerName');
+    playerscore > enemyscore ? sessionStorage.setItem('winner',hostName) : sessionStorage.setItem('winner',playerName);
   }
 
   useEffect(() => {
-    localStorage.setItem('enemyinc','10');
+    return () => {
+    sessionStorage.setItem('enemyinc','10');
     // Offline enemy motion logic : 
     // if(enemyinter === null){
     //   enemyinter = setInterval(() => {
     //     // console.log("run")
-    //     setenemyPos(pos =>  pos + Number(localStorage.getItem('enemyinc')));
+    //     setenemyPos(pos =>  pos + Number(sessionStorage.getItem('enemyinc')));
     //   },100);
     // }
 
@@ -143,9 +153,9 @@ const Home : React.FC = () => {
       var setSize = 5;
       if(event.key === 'ArrowDown'){
         setplayPos((pos) => {
-          if(localStorage.getItem('socketid')){
+          if(sessionStorage.getItem('socketid')){
           console.log("playerpos => ",pos);
-          socket.emit('playerPos',{ playerPos : pos + setSize, playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid')});
+          socket.emit('playerPos',{ playerPos : pos + setSize, playersocketId : sessionStorage.getItem('socketid') , enemySocketId : sessionStorage.getItem('opponentplayerid')});
         }
           return pos + setSize;
         }); 
@@ -153,7 +163,7 @@ const Home : React.FC = () => {
       }
       else if(event.key === 'ArrowUp'){
         setplayPos((pos) => { 
-          socket.emit('playerPos',{ playerPos : pos - setSize, playersocketId : localStorage.getItem('socketid') , enemySocketId : localStorage.getItem('opponentplayerid')});
+          socket.emit('playerPos',{ playerPos : pos - setSize, playersocketId : sessionStorage.getItem('socketid') , enemySocketId : sessionStorage.getItem('opponentplayerid')});
           return pos - setSize
         });
         if(!btnpress) setbulletPos(pos => { return {x : pos.x, y : pos.y - setSize}})
@@ -161,7 +171,7 @@ const Home : React.FC = () => {
       else if(event.key === ' '){
         btnpress = true;
         setbulletPos(pos => {
-          socket.emit('bulletpos',{ bulletpos : pos , playersocketId : localStorage.getItem('socketid'), enemySocketId : localStorage.getItem('opponentplayerid') })
+          socket.emit('bulletpos',{ bulletpos : pos , playersocketId : sessionStorage.getItem('socketid'), enemySocketId : sessionStorage.getItem('opponentplayerid') })
           return pos;
         })
         // if the bullet is fired by player move the bullet towards the enemy
@@ -183,6 +193,7 @@ const Home : React.FC = () => {
       }
       // console.log(btnpress);
     })
+  }
   },[]);
   return (
     <Page>
@@ -192,8 +203,8 @@ const Home : React.FC = () => {
           <img src="https://cdn-icons-png.flaticon.com/128/2218/2218103.png" alt="" className="" id="bullet-img" />
         </div>
       </PlayerDiv>
-      <div id = "score">{localStorage.getItem('hostname')} : {playerscore}</div>
-      <div id = "score">{localStorage.getItem('playerName')} : {enemyscore}</div>
+      <div id = "score">{sessionStorage.getItem('hostname')} : {playsc}</div>
+      <div id = "score">{sessionStorage.getItem('playerName')} : {enemysc}</div>
       <PlayerDiv>
         <Enemy pos = {enemyPos} />
         <div id = "bullet-enemy" style = {{ top : enemybulletPos.y + 5, left : enemybulletPos.x }}>

@@ -8,7 +8,7 @@ function Winner() {
         <h1>Winner</h1>
         <div className="win">
             <img src="https://img.icons8.com/?size=1x&id=X6CJMckcVrBj&format=png" alt="" />
-            <div id = "name">{localStorage.getItem('winner')}</div>
+            <div id = "name">{sessionStorage.getItem('winner')}</div>
         </div>
         <button onClick={() => { navigate('/'); }}>Home</button>
     </Page>

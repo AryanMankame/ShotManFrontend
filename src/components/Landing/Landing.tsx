@@ -8,7 +8,7 @@ const Landing = () => {
     console.log(socket)
     socket.on('connect', () => {
       console.log('Connected Socket',socket.id);
-      localStorage.setItem('socketid',socket.id)
+      sessionStorage.setItem('socketid',socket.id)
     })
   },[]);
   const [open,setopen] = useState(false);
@@ -25,8 +25,8 @@ const Landing = () => {
         <div>
             <img src = "gamelogo.png" alt = "img"></img>
             <div className="buttons">
-                <button onClick={() => { modalOpen(); localStorage.setItem('type','join')}}>JOIN</button>
-                <button onClick={() => { modalOpen(); localStorage.setItem('type','create')}}>CREATE</button>
+                <button onClick={() => { modalOpen(); sessionStorage.setItem('type','join')}}>JOIN</button>
+                <button onClick={() => { modalOpen(); sessionStorage.setItem('type','create')}}>CREATE</button>
             </div>
         </div> 
     }   

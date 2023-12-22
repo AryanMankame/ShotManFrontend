@@ -15,9 +15,9 @@ function Modal(props : any) {
   useEffect(() => {
     socket.on('userconnect',(args) => {
       console.log(args);
-      localStorage.setItem('opponentplayerid',args.id);
-      localStorage.setItem('hostname',args.hostName);
-      localStorage.setItem('playerName',args.playerName);
+      sessionStorage.setItem('opponentplayerid',args.id);
+      sessionStorage.setItem('hostname',args.hostName);
+      sessionStorage.setItem('playerName',args.playerName);
       navigate('/game');
     })
   },[])
@@ -25,10 +25,10 @@ function Modal(props : any) {
   const handleRequest = () => {
     setdis('loading');
     console.log(JSON.stringify({roomName : roomid,password}));
-    if(localStorage.getItem('type') === 'join'){
+    if(sessionStorage.getItem('type') === 'join'){
         fetch(`${backendUrl}/api/v1/updateroom/`,{
             method : "POST",
-            body : JSON.stringify({roomName : roomid ,password , playerName : hostName , playerId : localStorage.getItem('socketid') }),
+            body : JSON.stringify({roomName : roomid ,password , playerName : hostName , playerId : sessionStorage.getItem('socketid') }),
             headers: {
                 "Content-Type": "application/json",
             }
@@ -46,7 +46,7 @@ function Modal(props : any) {
             body : JSON.stringify({
                 roomName : roomid ,
                 password, 
-                hostId : localStorage.getItem('socketid'),
+                hostId : sessionStorage.getItem('socketid'),
                 hostName,
                 playerName : '',
                 playerId : ''
