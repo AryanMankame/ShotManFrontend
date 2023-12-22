@@ -12,6 +12,7 @@ var enemyinter : any = null;
 var winnerset : boolean = false;
 const Home : React.FC = () => {
   const navigate = useNavigate();
+  if(sessionStorage.getItem('playerName') === undefined && sessionStorage.getItem('hostName') === undefined) navigate('/');
   const [playsc, setplaysc] = useState(0);
   const [enemysc, setenemysc] = useState(0);
   useEffect(() => {
