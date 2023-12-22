@@ -2,6 +2,7 @@ import './App.css';
 import Home from './components/Home';
 import Landing from './components/Landing/Landing';
 import Winner from './components/Winner';
+import Timer from './components/parts/Timer';
 import Webrtc from './components/webRTC/Webrtc';
 import {
   createBrowserRouter,
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
   {
     path : "/winner",
     element : <Winner />
+  },
+  {
+    path : "/timer",
+    element : <Timer />
   }
 ])
 function App() {

@@ -4,6 +4,7 @@ import {socket} from './socket/Socket'
 import Player from './parts/Player';
 import Enemy from './parts/Enemy';
 import { useNavigate } from 'react-router-dom';
+import Timer from './parts/Timer';
 var timer : any = null;
 var timerenemy : any = null
 var btnpress : boolean = false;
@@ -21,7 +22,7 @@ const Home : React.FC = () => {
     setTimeout(() => {
       navigate('/winner');
       console.log('done')
-    },5*60*10000);
+    },Number(sessionStorage.getItem('timer'))*60*1000);
     winnerset = true;
     socket.on('connect', () => {
       // var socketId = socket.id
@@ -201,6 +202,7 @@ const Home : React.FC = () => {
         </div>
       </PlayerDiv>
       <div id = "score">{sessionStorage.getItem('hostname')} : {playsc}</div>
+      <Timer />
       <div id = "score">{sessionStorage.getItem('playerName')} : {enemysc}</div>
       <PlayerDiv>
         <Enemy pos = {enemyPos} />

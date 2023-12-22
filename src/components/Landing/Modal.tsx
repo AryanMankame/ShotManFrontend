@@ -89,6 +89,13 @@ function Modal(props : any) {
             <input onChange={(e) => {
                 sethostName(e.target.value);
             }} type = 'text'></input>
+            {sessionStorage.getItem('type') === 'create' ?
+            <>
+            <div style={{marginRight : '20vw',marginBottom:'10px'}}>Set Timer</div>
+            <input onChange={(e) => {
+                sessionStorage.setItem('timer',e.target.value);
+            }} type = 'number'></input>
+            </> : <></>}
             <button style={{marginBottom:'20px',marginTop:'20px'}} onClick = {handleRequest}>Done</button>
         </div>
         }
